@@ -1,4 +1,6 @@
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
+import { thunk } from "redux-thunk";
+import logger from "redux-logger";
 
 const localState = {
     count: 0,
@@ -19,7 +21,7 @@ function reducer(state=localState,action){
 
 }
 
-const store = createStore(reducer);
+const store = createStore(reducer, applyMiddleware(thunk,logger.default));
 
 store.subscribe(()=>{
     console.log(store.getState());
@@ -28,8 +30,20 @@ store.subscribe(()=>{
 const Increase = (val)=>{return {type:'Increase',payload:val}}
 const Decrease = (val)=>{return {type:'Decrease',payload:val}};
 
+// const AsyncDecrease = async (val)=>{return {type:'Decrease',payload:val}}
+
+function AsyncIncrease(val){
+    return async (dispatch,getState)=>{return dispatch({type:'Increase',payload:val})}
+}
+
+function AsyncDecrease(val){
+    return async (dispatch, getState)=>{return dispatch({type:'Decrease', payload:val})}
+}
+
 store.dispatch(Increase(100));
 store.dispatch(Increase(500));
 store.dispatch(Increase(1000));
 store.dispatch(Decrease(500));
+
+store.dispatch(AsyncIncrease(5000));
 store.dispatch({type:''});
